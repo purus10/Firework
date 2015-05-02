@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Board : MonoBehaviour {
+public class Checkers : MonoBehaviour {
 	
 	int[] board = new int[64];
 	// 1 = Player 1 piece, 2 = Player 1 king, 3 = Player 4 piece, 4 = Player 2 king;
@@ -43,32 +43,48 @@ public class Board : MonoBehaviour {
 		{
 			if (board[i] == 2 || board[i] == 3) move = i-9;
 			else if (board[i] == 1 || board[i] == 4) move = i+7;
-		} else move = 0;
+		}
 		return move;
 	}
 	//FIX THIS FOR THE KING!!!!
 	/**/
 	int LeftEnemyCheck(int i, int player)
 	{
-		if (player == 1)
+		int move = 0;
+		if (player == 1) 
 		{
-			if (i-18 > 0 && board[i-9] > 2 && BoarderCheck(board[i-9],player) == 0) return i-18;
-			else return 0;
-		} else{
-			if (i+18 < 63 && board[i+9] == 3 || board[i+9] == 4 && BoarderCheck(board[i+18],player) == 0) return i+18;
-			else return 0;
+			if (board [i] == 3) 
+			{
+				if (board[BoarderCheck (board [i - 14], player)] == 0 && i - 14 > 0 && board [i - 7] < 3) move = i - 14;
+				else if (board[BoarderCheck (board [i - 14], player)] != 0 && i - 18 > 0 && board [i - 9] < 3) move = i - 18;
+			} else if (board[BoarderCheck (board [i + 14], player)] == 0 &&i + 18 > 0 && board [i + 9] < 3) move = i + 18;
+		} else {
+			if (board [i] == 1) 
+			{
+				if (i + 14 < 63 && board[BoarderCheck (board [i + 14], player)] == 0 && board [i - 7] < 3) move = i + 14;
+				else if (i + 18 < 63 && board[BoarderCheck (board [i + 14], player)] != 0 && board [i - 9] < 3) move = i + 18;
+			} else if (board[BoarderCheck (board [i - 14], player)] == 0 && i - 18 > 0 && board [i - 9] == 3 || board [i - 9] == 4) move = i - 18;
 		}
+		return move;
 	}
 	int RightEnemyCheck(int i, int player)
 	{
-		if (player == 1)
+		int move = 0;
+		if (player == 1) 
 		{
-			if (i-14 > 0 && board[i-7] > 1 && BoarderCheck(board[i-7],player) == 0) return i-14;
-			return 0;
+			if (board [i] == 3) 
+			{
+				if (board[BoarderCheck (board [i - 14], player)] == 0 && i - 14 > 0 && board [i - 7] < 3) move = i - 14;
+				else if (board[BoarderCheck (board [i - 14], player)] != 0 && i - 18 > 0 && board [i - 9] < 3) move = i - 18;
+			} else if (board[BoarderCheck (board [i + 14], player)] == 0 &&i + 18 > 0 && board [i + 9] < 3) move = i + 18;
 		} else {
-			if (i+14 < 63 && board[i+7] == 3 || board[i+7] == 4 && BoarderCheck(board[i+14],player) == 0) return i+14;
-			return 0;
+			if (board [i] == 1) 
+			{
+				if (i + 18 < 63 && board[BoarderCheck (board [i + 18], player)] == 0 && board [i - 9] < 3) move = i + 18;
+				else if (i + 14 < 63 && board[BoarderCheck (board [i + 18], player)] != 0 && board [i - 7] < 3) move = i + 14;
+			} else if (board[BoarderCheck (board [i - 18], player)] == 0 && i - 14 > 0 && board [i - 7] == 3 || board [i - 7] == 4) move = i - 14;
 		}
+		return move;
 	}
 	/**/
 	int KingCheck(int i, int player)
@@ -82,7 +98,7 @@ public class Board : MonoBehaviour {
 	{
 		for (int i = 0;i<board.Length;i++)
 		{
-			if ( i > 0 && i < 8 && i % 2 == 1|| i > 7 && i < 15 && i % 2 == 0 || i > 16 && i < 24 && i % 2 == 1) board[i] = 1;
+			if ( i > 0 && i < 8 && i % 2 == 1|| /*i > 7 && i < 15 && i % 2 == 0 ||*/ i > 16 && i < 24 && i % 2 == 1) board[i] = 1;
 			if (i > 39 && i < 48 && i % 2 == 0 /*|| i > 48 && i < 56 && i % 2 == 1 || i > 55 && i < 63 && i % 2 == 0*/) board[i] = 3;
 		}
 	}
@@ -116,8 +132,10 @@ public class Board : MonoBehaviour {
 						saved = i;
 						if (BoarderCheck(i,player) == 0)
 						{
+							print (LeftEnemyCheck(i,player));
 							if (board[MoveCheckLeft(i,player)] != 0 && board[LeftEnemyCheck(i,player)] == 0) board[LeftEnemyCheck(i,player)] = 6;
 							else if (board[MoveCheckLeft(i,player)] == 0) board[MoveCheckLeft(i,player)] = 5;
+
 							if (board[MoveCheckRight(i,player)] != 0 && board[RightEnemyCheck(i,player)] == 0) board[RightEnemyCheck(i,player)] = 6;
 							else if (board[MoveCheckRight(i,player)] == 0) board[MoveCheckRight(i,player)] = 5;
 						}else{
@@ -128,11 +146,15 @@ public class Board : MonoBehaviour {
 					}
 					if (board[i] == 6)
 					{
+					/*	print ("COORD = "+i);
 						if (player == 0)
-							if (board[i-18] == 1 || board[i-18] == 2) enemy = i-9;
-						else if (board[i-14] == 1 || board[i-14] == 2) enemy = i-7;
+							if (board[i+9] == 1) enemy = i-9;
+						else if (board[i+9] == 2) enemy = i+9;
+						else if (board[i-14] == 1) enemy = i-7;
+						else if (board[i-14] == 2) enemy = i+7;
+						print (enemy);*/
 					}
-					if (board[i] > 3) 
+					if (board[i] > 4) 
 					{
 						board[i] = board[saved];
 						board[saved] = 0;
@@ -143,6 +165,7 @@ public class Board : MonoBehaviour {
 							if (player == 0) red_pieces--;
 							else white_pieces--;
 							print ("RED REMAINING = "+red_pieces+" WHITE REMAINING = "+white_pieces);
+							enemy = 0;
 						}
 					}
 					if (KingCheck(i,player) != 0) board[i] = KingCheck(i,player);

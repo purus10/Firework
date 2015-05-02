@@ -12,7 +12,7 @@ public class TicTacToe : MonoBehaviour {
 	int player, flow; //Tracks number of Players;
 	Rect BoardSet(float x, float y, float w, float h, int i)
 	{
-		return new Rect (x + (w * (i/3 % 3)), y + (h * (i % 3)), w, h);
+		return new Rect (x + (w * (i % 3)), y + (h * (i/3 % 3)), w, h);
 	}
 	string Mark(int b)
 	{
